@@ -4,6 +4,7 @@ using Microsoft.Extensions.AI;
 using Microsoft.Extensions.AI.Mcp.Authentication;
 using Microsoft.Extensions.AI.Mcp.Authentication.Extensions;
 using Microsoft.Extensions.DependencyInjection;
+using Xunit;
 
 namespace Microsoft.Extensions.AI.Mcp.Authentication.Tests;
 
@@ -24,7 +25,7 @@ public sealed class AuthenticatedHttpMessageHandlerTests
         };
 
         using var client = new HttpClient(handler);
-        using var response = await client.GetAsync("https://example.test/mcp");
+        using var response = await client.GetAsync("https://example.test/mcp", TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.NotNull(capturedRequest);
@@ -58,7 +59,7 @@ public sealed class AuthenticatedHttpMessageHandlerTests
         };
 
         using var client = new HttpClient(handler);
-        using var response = await client.GetAsync("https://example.test/mcp");
+        using var response = await client.GetAsync("https://example.test/mcp", TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Equal(new[] { "stale", "fresh" }, tokens);
@@ -77,7 +78,7 @@ public sealed class AuthenticatedHttpMessageHandlerTests
         };
 
         using var client = new HttpClient(handler);
-        using var response = await client.GetAsync("https://example.test/mcp");
+        using var response = await client.GetAsync("https://example.test/mcp", TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
         Assert.Equal(2, authHandler.TokenRequestCount);
@@ -96,8 +97,8 @@ public sealed class AuthenticatedHttpMessageHandlerTests
         Assert.Single(functions);
         Assert.Equal("ping", functions[0].Name);
 
-        var result = await functions[0].InvokeAsync(new AIFunctionArguments());
-        Assert.Equal("pong", result);
+        var result = await functions[0].InvokeAsync(new AIFunctionArguments(), TestContext.Current.CancellationToken);
+        Assert.Equal("pong", result?.ToString());
     }
 
     [Fact]
@@ -118,7 +119,7 @@ public sealed class AuthenticatedHttpMessageHandlerTests
 
         using var provider = services.BuildServiceProvider();
         var factory = provider.GetRequiredService<IHttpClientFactory>();
-        using var response = await factory.CreateClient("mcp").GetAsync("https://example.test/mcp");
+        using var response = await factory.CreateClient("mcp").GetAsync("https://example.test/mcp", TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Equal("di-token", capturedRequest?.Headers.Authorization?.Parameter);
