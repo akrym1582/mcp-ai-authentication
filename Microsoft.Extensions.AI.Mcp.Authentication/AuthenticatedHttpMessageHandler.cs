@@ -84,20 +84,10 @@ public sealed class AuthenticatedHttpMessageHandler : DelegatingHandler
             clone.Options.Set(new HttpRequestOptionsKey<object?>(option.Key), option.Value);
         }
 
-#pragma warning disable CS0618
-        foreach (var property in request.Properties)
-        {
-            clone.Properties[property.Key] = property.Value;
-        }
-#pragma warning restore CS0618
-
         if (request.Content is not null)
         {
-            var memoryStream = new MemoryStream();
-            await request.Content.CopyToAsync(memoryStream, cancellationToken).ConfigureAwait(false);
-            memoryStream.Position = 0;
-
-            clone.Content = new StreamContent(memoryStream);
+            var contentBytes = await request.Content.ReadAsByteArrayAsync(cancellationToken).ConfigureAwait(false);
+            clone.Content = new ByteArrayContent(contentBytes);
             foreach (var header in request.Content.Headers)
             {
                 clone.Content.Headers.TryAddWithoutValidation(header.Key, header.Value);
