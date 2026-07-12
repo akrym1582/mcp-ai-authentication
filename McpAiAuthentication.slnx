@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="Microsoft.Extensions.AI.Mcp.Authentication.Extensions/Microsoft.Extensions.AI.Mcp.Authentication.Extensions.csproj" />
+  <Project Path="Microsoft.Extensions.AI.Mcp.Authentication.Tests/Microsoft.Extensions.AI.Mcp.Authentication.Tests.csproj" />
+  <Project Path="Microsoft.Extensions.AI.Mcp.Authentication/Microsoft.Extensions.AI.Mcp.Authentication.csproj" />
+</Solution>
